@@ -22,23 +22,32 @@ const HomeScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState('Visos kategorijos');
 
   useEffect(() => {
+    console.log('Selected Category:', selectedCategory);
     const fetchData = async () => {
-      try {
-        const querySnapshot = await firebase.firestore().collection('uzsakymas').get();
-        const orders = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+  try {
+    console.log('Fetching data...');
+    const querySnapshot = await firebase.firestore().collection('Apmokėjimas').get();
+    console.log('Data fetched:', querySnapshot.docs.map(doc => doc.data()));
 
-        const filteredOrders = selectedCategory !== 'Visos kategorijos'
-          ? orders.filter(order => order.kategorija === selectedCategory)
-          : orders;
-        setUsers(filteredOrders);
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-      }
-    };
+    const orders = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
+    console.log('All Orders:', orders);
+
+    const filteredOrders = selectedCategory !== 'Visos kategorijos'
+      ? orders.filter(order => order.category === selectedCategory)
+      : orders;
+
+    console.log('Filtered Orders:', filteredOrders);
+
+    setUsers(filteredOrders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+  }
+};
+  
     fetchData();
   }, [selectedCategory]);
 
@@ -59,9 +68,10 @@ const HomeScreen = ({ navigation }) => {
                 style={styles.categoryPicker}
                 >
             <Picker.Item label="Visos kategorijos" value="Visos kategorijos" style={styles.pickerLabel}/>
-            <Picker.Item label="Gėrimas" value="Gėrimas" style={styles.pickerLabel}/>
-            <Picker.Item label="Patiekalas" value="Patiekalas" style={styles.pickerLabel}/>
-            <Picker.Item label="Desertas" value="Desertas" style={styles.pickerLabel}/>
+            <Picker.Item label="Gėrimai" value="Drink" style={styles.pickerLabel}/>
+            <Picker.Item label="Patiekalai" value="Food" style={styles.pickerLabel}/>
+            <Picker.Item label="Desertai" value="Desert" style={styles.pickerLabel}/>
+            <Picker.Item label="Užkandžiai" value="Snack" style={styles.pickerLabel}/>
             </Picker>
         </View>
         <FlatList
