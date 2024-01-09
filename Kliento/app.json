@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "BaigiamasisProjektas",
+    "slug": "BaigiamasisProjektas",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
