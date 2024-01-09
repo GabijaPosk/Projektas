@@ -1,121 +1,92 @@
-import React from 'react';
-import { View, Text, StyleSheet, Alert, TouchableHighlight } from 'react-native';
-import { useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, Alert, TouchableHighlight, Modal, TouchableOpacity } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
 import { cancelOrderAction } from '../redux/OrderSlice';
+import { cancelOrder } from '../redux/OrderService'; 
+import { firebase } from '../authentication/config/Firebase'; 
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-const CancelScreen = ({ route, navigation }) => {
-  const dispatch = useDispatch();
-  const { order } = route.params;
+const CancelScreen = () => {
+    const dispatch = useDispatch();
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { order } = route.params;
+    const { id: itemId } = order;
+  
+    useEffect(() => {
+    }, [itemId]);
+  
+    const handleCancel = () => {
+        navigation.navigate('Pagrindinis'); 
+      };
 
-  const handleCancelOrder = () => {
-    Alert.alert(
-      'Patvirtinimas',
-      'Ar jūs tikrai norite atšaukti šį užsakymą?',
-      [
-        {
-          text: 'Grįžti',
-          onPress: () => console.log('Grįžti'),
-          style: 'atšaukti',
-        },
-        {
-          text: 'Atšaukti',
-          onPress: () => {
-            dispatch(cancelOrderAction(order.id));
-            navigation.navigate('Pagrindinis'); 
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  };
+      const handleDeleteItem = async () => {
+        try {
+          console.log('Deleting  item with itemId:', itemId);
+          await firebase.firestore().collection('Apmokėjimas').doc(itemId).delete();
+          console.log(' item deleted successfully');
+          dispatch(cancelOrderAction(itemId));
+    
+          navigation.navigate('Pagrindinis');
+        } catch (error) {
+          console.error('Error deleting  item:', error);
+        }
+      };
 
-return (
+  return (
     <View style={styles.container}>
       <Text style={styles.title}>Atšaukti užsakymą</Text>
-      <View style={styles.infoBlock}>
-        <Text style={styles.infoLabel}>Pavadinimas:</Text>
-        <Text style={styles.infoText}>{order.pavadinimas}</Text>
-        <Text style={styles.infoLabel}>Kiekis:</Text>
-        <Text style={styles.infoText}>{order.kiekis}</Text>
-      </View>
+      <Text style={styles.warningText}>Ar tikrai norite atšaukti šį užsakymą?</Text>
       <View style={styles.buttonContainer}>
-        <TouchableHighlight
-          style={styles.button}
-          underlayColor="#FBCFCD"
-          onPress={handleCancelOrder}
-        >
-          <Text style={styles.buttonText}>Atšaukti užsakymą</Text>
-        </TouchableHighlight>
-        <View style={styles.buttonContainerback}>
-        <TouchableHighlight
-          style={styles.buttoncancel}
-          underlayColor="#FBCFCD"
-          onPress={() => navigation.goBack()}
-        >
+      <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteItem}>
+        <Text style={styles.buttonText}>Atšaukti</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
           <Text style={styles.buttonText}>Grįžti</Text>
-        </TouchableHighlight>
+        </TouchableOpacity>
       </View>
       </View>
-    </View>
   );
 };
 
-
-
 const styles = StyleSheet.create({
-    buttonContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-      },
   container: {
     flex: 1,
-    padding: 50,
+    padding: 20,
     backgroundColor: '#FFFFFF',
-  },
-  button: {
-    backgroundColor: "#709999",
-    padding: 20,
-    borderRadius: 20,
-    alignItems: "center",
-    marginTop: 20, 
-    marginRight: 10,
-  },
-  buttoncancel: {
-    backgroundColor: "#997070",
-    padding: 20,
-    borderRadius: 20,
-    height:60,
-    width:100,
-    alignItems: "center",
-    marginTop: 20, 
-    marginLeft: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 50,
-    alignSelf: "center",
-    color: '#997070',
-  },
-  infoBlock: {
-    backgroundColor: "#FFFAFA",
-    padding: 20,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderColor: "#997070",
-    borderWidth: 10,
-  },
-  infoLabel: {
-    fontWeight: 'bold',
-    color: '#997070',
-  },
-  infoText: {
-    color: '#997070',
     marginBottom: 20,
+  },
+  warningText: {
+    color: 'red',
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    backgroundColor: 'gray',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 50,
   },
 });
 
